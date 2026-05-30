@@ -205,4 +205,28 @@ const validators = {
   })
 };
 
-module.exports = { validator, validate, validators };
+// Partial validation for updates (only validates fields present in req.body)
+const validatePartial = (rules) => (req, res, next) => {
+  const errors = {};
+  for (const [field, checks] of Object.entries(rules)) {
+    const value = field.includes('.') ? getNestedValue(req.body, field) : req.body[field];
+    if (value === undefined) continue; // skip fields not provided
+    for (const check of checks) {
+      const result = check(value, field);
+      if (result !== true) {
+        errors[field] = result;
+        break;
+      }
+    }
+  }
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({
+      message: 'Validation failed',
+      errors,
+      type: 'VALIDATION_ERROR'
+    });
+  }
+  next();
+};
+
+module.exports = { validator, validate, validatePartial, validators };

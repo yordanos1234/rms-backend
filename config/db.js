@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
 let mongod = null;
 
@@ -11,6 +10,7 @@ const connectDB = async () => {
   } catch (err) {
     console.warn('Local MongoDB not available, starting in-memory MongoDB...');
     try {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
       mongod = await MongoMemoryServer.create({
         binary: { version: '6.0.16' }
       });

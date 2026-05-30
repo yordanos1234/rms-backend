@@ -1,7 +1,7 @@
 const express = require('express');
 const Grade = require('../models/Grade');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all grades
@@ -46,7 +46,7 @@ router.post('/', auth, authorize('instructor', 'registrar', 'admin'), validators
 });
 
 // Update grade (instructor for draft, registrar for approval)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validatePartial(validators.gradeCreate), async (req, res) => {
   try {
     const grade = await Grade.findById(req.params.id);
     if (!grade) return res.status(404).json({ message: 'Grade not found', type: 'NOT_FOUND' });

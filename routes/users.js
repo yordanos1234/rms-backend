@@ -2,7 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all users (admin only)
@@ -56,6 +56,46 @@ router.put('/:id', auth, async (req, res) => {
       delete req.body.role;
       delete req.body.isActive;
     }
+
+    // Validate provided fields
+    const userUpdateRules = {
+      name: [
+        (v) => validator.isNotEmpty(v) || 'Name is required',
+        (v) => validator.minLength(v, 2) || 'Name must be at least 2 characters',
+        (v) => validator.maxLength(v, 100) || 'Name must be at most 100 characters'
+      ],
+      email: [
+        (v) => validator.isNotEmpty(v) || 'Email is required',
+        (v) => validator.isEmail(v) || 'Please enter a valid email address'
+      ],
+      department: [
+        (v) => !v || validator.minLength(v, 2) || 'Department must be at least 2 characters',
+        (v) => !v || validator.maxLength(v, 100) || 'Department must be at most 100 characters'
+      ],
+      phone: [
+        (v) => !v || validator.isValidPhone(v) || 'Phone must be a valid Ethiopian number'
+      ]
+    };
+    const { validator: vlib } = require('../middleware/validate');
+    const errors = {};
+    for (const [field, checks] of Object.entries(userUpdateRules)) {
+      if (req.body[field] === undefined) continue;
+      for (const check of checks) {
+        const result = check(req.body[field], field);
+        if (result !== true) { errors[field] = result; break; }
+      }
+    }
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ message: 'Validation failed', errors, type: 'VALIDATION_ERROR' });
+    }
+
+    // Hash password if provided
+    if (req.body.password) {
+      const bcrypt = require('bcryptjs');
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
+    }
+
     const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found', type: 'NOT_FOUND' });
     res.json({ message: 'User updated successfully', user });

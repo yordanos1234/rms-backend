@@ -1,7 +1,7 @@
 const express = require('express');
 const Announcement = require('../models/Announcement');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all announcements
@@ -38,7 +38,7 @@ router.post('/', auth, authorize('admin', 'registrar', 'department_head'), valid
 });
 
 // Update announcement (only by author or admin)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, validatePartial(validators.announcementCreate), async (req, res) => {
   try {
     const announcement = await Announcement.findById(req.params.id);
     if (!announcement) return res.status(404).json({ message: 'Announcement not found', type: 'NOT_FOUND' });

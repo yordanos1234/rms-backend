@@ -2,7 +2,7 @@ const express = require('express');
 const Student = require('../models/Student');
 const User = require('../models/User');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all students
@@ -51,7 +51,7 @@ router.post('/', auth, authorize('registrar', 'admin'), validators.studentCreate
 });
 
 // Update student
-router.put('/:id', auth, authorize('registrar', 'admin', 'student'), async (req, res) => {
+router.put('/:id', auth, authorize('registrar', 'admin', 'student'), validatePartial(validators.studentCreate), async (req, res) => {
   try {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: 'Student not found', type: 'NOT_FOUND' });

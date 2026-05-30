@@ -1,7 +1,7 @@
 const express = require('express');
 const Course = require('../models/Course');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all courses
@@ -42,7 +42,7 @@ router.post('/', auth, authorize('admin', 'department_head', 'registrar'), valid
 });
 
 // Update course
-router.put('/:id', auth, authorize('admin', 'department_head', 'registrar'), async (req, res) => {
+router.put('/:id', auth, authorize('admin', 'department_head', 'registrar'), validatePartial(validators.courseCreate), async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) return res.status(404).json({ message: 'Course not found', type: 'NOT_FOUND' });

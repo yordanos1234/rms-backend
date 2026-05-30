@@ -1,7 +1,7 @@
 const express = require('express');
 const DocumentRequest = require('../models/DocumentRequest');
 const { auth, authorize } = require('../middleware/auth');
-const { validators } = require('../middleware/validate');
+const { validators, validatePartial } = require('../middleware/validate');
 const router = express.Router();
 
 // Get all document requests
@@ -48,7 +48,7 @@ router.post('/', auth, authorize('student'), validators.docCreate, async (req, r
 });
 
 // Update document request (registrar/admin)
-router.put('/:id', auth, authorize('registrar', 'admin'), async (req, res) => {
+router.put('/:id', auth, authorize('registrar', 'admin'), validatePartial(validators.docCreate), async (req, res) => {
   try {
     const doc = await DocumentRequest.findById(req.params.id);
     if (!doc) return res.status(404).json({ message: 'Document request not found', type: 'NOT_FOUND' });
