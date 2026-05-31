@@ -5,10 +5,10 @@
 
 <!-- Typing Animation -->
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=059669&center=true&vCenter=true&multiline=true&width=700&lines=Addis+Ababa+University+%F0%9F%8E%93;Computer+Science+Final+Year+Defense+Project;RESTful+API+for+Academic+Registrar+Operations" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=059669&center=true&vCenter=true&multiline=true&width=700&height=110&lines=Addis+Ababa+University+%F0%9F%8E%93;Computer+Science+Final+Year+Defense+Project;RESTful+API+for+Academic+Registrar+Operations" alt="Typing SVG" />
 </a>
 
-<br/>
+<br/><br/><br/>
 
 <!-- Badges -->
 <img src="https://img.shields.io/badge/AAU-Computer%20Science-004B87?style=for-the-badge&logo=google-scholar&logoColor=white"/>
